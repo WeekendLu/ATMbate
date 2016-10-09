@@ -232,7 +232,7 @@ class StockSelector(object):
 
 tdb = pymongo.MongoClient()
 db = tdb.stock
-testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(70).skip(0)
+testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(20).skip(0)
 testday = []
 for i in testinfo:
     testday.append(time.strftime('%Y-%m-%d', time.localtime(i["time"])))
