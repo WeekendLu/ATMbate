@@ -17,11 +17,11 @@ class StockSelector(object):
         self.final = []
 
         self.marketvaluesmall = 0  #最小流值,默认20
-        self.marketvaluebig = 99  #最大流值,默认90
+        self.marketvaluebig = 999999  #最大流值,默认90
         self.cirlation = 0  #流值/市值,默认0.88
         self.pemin = 0  #最小市盈率,默认0
         self.pemax = 999999  #最大市盈率,默认999
-        self.turnoverretemin = 0  #换手率最小,默认5
+        self.turnoverretemin = 1  #换手率最小,默认5
         self.turnoverretemax = 6  #换手率最大,默认20
         self.amplitudepcsmall = 3  #振幅下限,默认5
         self.amplitudepcbig = 20  #振幅上限,默认20
@@ -232,7 +232,7 @@ class StockSelector(object):
 
 tdb = pymongo.MongoClient()
 db = tdb.stock
-testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(20).skip(0)
+testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(70).skip(0)
 testday = []
 for i in testinfo:
     testday.append(time.strftime('%Y-%m-%d', time.localtime(i["time"])))
