@@ -29,12 +29,12 @@ class StockSelector(object):
         self.increasemax = 11  #涨幅,默认11
         self.volcountday = 30  #交易量统计天数,默认30
         self.volamplitude = 1.2  #不超过最低交易量的几倍,默认1.06
-        self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认1.2
+        self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
         self.hisincreasecountday = 7
         self.hisincreasedaymax = 7
         self.pricecountday = 7  #股价统计天数,默认7
-        self.priceincreasesmall = -0.005  #上面天数+1合计最低涨幅,默认0.16
-        self.priceincreasebig = 0.04  #上面天数+1合计最高涨幅,默认0.36
+        self.priceincreasesmall = -0.006  #上面天数+1合计最低涨幅,默认0.16
+        self.priceincreasebig = 0.05  #上面天数+1合计最高涨幅,默认0.36
         self.pricecontrol = 1000  #股价上限控制,默认1000
         self.showcount = 1 #统计几只入围股票,默认3
         self.holdday = 2  #持有天数
@@ -53,12 +53,12 @@ class StockSelector(object):
         self.currentprice()
         self.countfinanwerght()
 
-
     def moveStop(self):  #停牌筛选
         selector = self.allinfo
         self.final = []
         for i in xrange(len(selector)):
             if selector[i]["vol"] != 0:
+                # if selector[i]["name"] != "002256":
                 # if selector[i]["name"][0] != "3":
                     selector[i]["weight"] = []
                     self.final.append(selector[i])
