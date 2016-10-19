@@ -21,9 +21,9 @@ class StockSelector(object):
         self.cirlation = 0  #流值/市值,默认0.88
         self.pemin = 0  #最小市盈率,默认0
         self.pemax = 999999  #最大市盈率,默认999
-        self.turnoverretemin = 1  #换手率最小,默认5
+        self.turnoverretemin = 1  #换手率最小,默认1
         self.turnoverretemax = 6  #换手率最大,默认20
-        self.amplitudepcsmall = 3  #振幅下限,默认5
+        self.amplitudepcsmall = 3  #振幅下限,默认3
         self.amplitudepcbig = 20  #振幅上限,默认20
         self.increasemin = -11
         self.increasemax = 11  #涨幅,默认11
@@ -32,14 +32,14 @@ class StockSelector(object):
         self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
         self.hisincreasecountday = 7
         self.hisincreasedaymax = 7
-        self.pricecountday = 7  #股价统计天数,默认7
-        self.priceincreasesmall = -0.8  #上面天数+1合计最低涨幅,默认-0.006
-        self.priceincreasebig = 8  #上面天数+1合计最高涨幅,默认0.05
+        self.pricecountday = 10  #股价统计天数,默认7
+        self.priceincreasesmall = -0.8  #上面天数+1合计最低涨幅,默认-0.8
+        self.priceincreasebig = 8  #上面天数+1合计最高涨幅,默认8
         self.pricecontrol = 1000  #股价上限控制,默认1000
         self.showcount = 1 #统计几只入围股票,默认3
         self.holdday = 2  #持有天数
         self.skipday = 0  #跳过天数
-        self.bomeng = 100000 * 0.01  #博萌比例
+        self.bomeng = 999999 * 0.01  #博萌比例
 
     def funtioncontry(self):
         self.moveStop()
@@ -58,7 +58,7 @@ class StockSelector(object):
         self.final = []
         for i in xrange(len(selector)):
             if selector[i]["vol"] != 0:
-                if selector[i]["name"] != "002256":
+                # if selector[i]["name"] != "002256":
                 # if selector[i]["name"][0] != "3":
                     selector[i]["weight"] = []
                     self.final.append(selector[i])
@@ -225,7 +225,7 @@ class StockSelector(object):
             except IndexError:
                 pass
         try:
-            final.append(shouyi / len(final))
+            final.append(round(shouyi / len(final), 3))
         except ZeroDivisionError:
             pass
         return final
