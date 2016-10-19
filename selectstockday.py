@@ -10,7 +10,7 @@ class StockSelector(object):
         self.db = tdb.stock
         self.today = int(time.mktime(time.strptime(testday, "%Y-%m-%d")))
         # self.today = time.time()
-        info = self.db.info.find({"time": {"$lt": self.today}}).sort("time", pymongo.DESCENDING).limit(2868)
+        info = self.db.info.find({"time": {"$lt": self.today}}).sort("time", pymongo.DESCENDING).limit(2932)
         self.allinfo = []
         for i in info:
             self.allinfo.append(i)
@@ -28,18 +28,18 @@ class StockSelector(object):
         self.increasemin = -11
         self.increasemax = 11  #涨幅,默认11
         self.volcountday = 30  #交易量统计天数,默认30
-        self.volamplitude = 1.2  #不超过最低交易量的几倍,默认1.06
+        self.volamplitude = 1.2  #不超过最低交易量的几倍,默认1.2
         self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
         self.hisincreasecountday = 7
         self.hisincreasedaymax = 7
         self.pricecountday = 7  #股价统计天数,默认7
-        self.priceincreasesmall = -0.006  #上面天数+1合计最低涨幅,默认0.16
-        self.priceincreasebig = 0.05  #上面天数+1合计最高涨幅,默认0.36
+        self.priceincreasesmall = -0.8  #上面天数+1合计最低涨幅,默认-0.006
+        self.priceincreasebig = 8  #上面天数+1合计最高涨幅,默认0.05
         self.pricecontrol = 1000  #股价上限控制,默认1000
         self.showcount = 1 #统计几只入围股票,默认3
         self.holdday = 2  #持有天数
         self.skipday = 0  #跳过天数
-        self.bomeng = 0.66 * 0.01  #博萌比例
+        self.bomeng = 100000 * 0.01  #博萌比例
 
     def funtioncontry(self):
         self.moveStop()
@@ -58,7 +58,7 @@ class StockSelector(object):
         self.final = []
         for i in xrange(len(selector)):
             if selector[i]["vol"] != 0:
-                # if selector[i]["name"] != "002256":
+                if selector[i]["name"] != "002256":
                 # if selector[i]["name"][0] != "3":
                     selector[i]["weight"] = []
                     self.final.append(selector[i])
@@ -151,7 +151,7 @@ class StockSelector(object):
                         pricelist.append(j["currentprice"])
                         highlist.append(j["highest"])
                         lowlist.append(j["lowest"])
-                if selector[i]["currentprice"] > min(lowlist) and self.priceincreasesmall <= (selector[i]["currentprice"] - min(pricelist)) / min(pricelist) <= self.priceincreasebig and selector[i]["currentprice"] <= self.pricecontrol:
+                if selector[i]["currentprice"] > min(lowlist) and self.priceincreasesmall * 0.01 <= (selector[i]["currentprice"] - min(pricelist)) / min(pricelist) <= self.priceincreasebig * 0.01 and selector[i]["currentprice"] <= self.pricecontrol:
                     # selector[i]["weight"].append((selector[i]["currentprice"] - min(pricelist)) / min(pricelist))
                     self.final.append(selector[i])
             except:
@@ -211,14 +211,14 @@ class StockSelector(object):
                         if (asd[holddayindex]["opening"] - asd[holddayindex]["yesterdayclose"]) / asd[holddayindex]["yesterdayclose"] < 0.098:
                             if asd[holddayindex]["opening"] * bomeng <= asd[holddayindex]["highest"]:
                                 shouyi += (((asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                                final.append((asd[0]["name"], (asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5))
+                                final.append((asd[0]["name"], round((asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3)))
                             else:
                                 shouyi += (((asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                                final.append((asd[0]["name"], "BF", (asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5))
+                                final.append((asd[0]["name"], "BF", round((asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3)))
 
                         else:
                             shouyi += (((asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                            final.append((asd[0]["name"], "nobomeng", (asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5))
+                            final.append((asd[0]["name"], "nobomeng", round(asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3))
 
                 except:
                     print asd[0]["name"] + " pass"
@@ -232,7 +232,7 @@ class StockSelector(object):
 
 tdb = pymongo.MongoClient()
 db = tdb.stock
-testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(95).skip(0)
+testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(96).skip(0)
 testday = []
 for i in testinfo:
     testday.append(time.strftime('%Y-%m-%d', time.localtime(i["time"])))
@@ -243,8 +243,8 @@ for i in testday:
     a = a.test()
     a.append(i)
     try:
-        zongshouyi = zongshouyi + (zongshouyi * a[-2] * 0.01)
+        zongshouyi = round(zongshouyi + (zongshouyi * a[-2] * 0.01), 3)
         print a
     except IndexError:
         zongshouyi += 0
-print zongshouyi, len(testday), (zongshouyi - 1) / len(testday) * 100
+print zongshouyi, len(testday), round((zongshouyi - 1) / len(testday) * 100, 3)
