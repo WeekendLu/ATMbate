@@ -25,8 +25,8 @@ class StockSelector(object):
         self.turnoverretemax = 6  #换手率最大,默认20
         self.amplitudepcsmall = 3  #振幅下限,默认3
         self.amplitudepcbig = 20  #振幅上限,默认20
-        self.increasemin = -11
-        self.increasemax = 11  #涨幅,默认11
+        self.increasepcmin = -11
+        self.increasepcmax = -0.4  #涨幅,默认11
         self.volcountday = 30  #交易量统计天数,默认30
         self.volamplitude = 1.2  #不超过最低交易量的几倍,默认1.2
         self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
@@ -97,14 +97,14 @@ class StockSelector(object):
         for i in range(len(selector)):
             if self.amplitudepcsmall <= selector[i]["amplitudepc"] <= self.amplitudepcbig:
                 selector[i]["weight"].append(selector[i]["amplitudepc"])
-                selector[i]["weight"].append(selector[i]["increase"])
+                selector[i]["weight"].append(selector[i]["increasepc"])
                 self.final.append(selector[i])
 
     def increasepc(self):#筛选涨幅
         selector = self.final
         self.final = []
         for i in range(len(selector)):
-            if self.increasemin <= selector[i]["increasepc"] < self.increasemax and selector[i]["currentprice"] < selector[i]["opening"]:
+            if self.increasepcmin <= selector[i]["increasepc"] <= self.increasepcmax and selector[i]["currentprice"] < selector[i]["opening"]:
                 self.final.append(selector[i])
 
     def vol(self):#交易量
@@ -211,28 +211,28 @@ class StockSelector(object):
                         if (asd[holddayindex]["opening"] - asd[holddayindex]["yesterdayclose"]) / asd[holddayindex]["yesterdayclose"] < 0.098:
                             if asd[holddayindex]["opening"] * bomeng <= asd[holddayindex]["highest"]:
                                 shouyi += (((asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                                final.append((asd[0]["name"], round((asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3)))
+                                final.append((asd[0]["name"], (asd[holddayindex]["opening"] * bomeng - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5))
                             else:
                                 shouyi += (((asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                                final.append((asd[0]["name"], "BF", round((asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3)))
+                                final.append((asd[0]["name"], "BF", (asd[holddayindex]["currentprice"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5))
 
                         else:
                             shouyi += (((asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"]) * 100 - 0.5) / self.holdday
-                            final.append((asd[0]["name"], "nobomeng", round(asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5, 3))
+                            final.append((asd[0]["name"], "nobomeng", asd[holddayindex]["opening"] - asd[0]["opening"]) / asd[0]["opening"] * 100 - 0.5)
 
                 except:
                     print asd[0]["name"] + " pass"
             except IndexError:
                 pass
         try:
-            final.append(round(shouyi / len(final), 3))
+            final.append(shouyi / len(final))
         except ZeroDivisionError:
             pass
         return final
 
 tdb = pymongo.MongoClient()
 db = tdb.stock
-testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(96).skip(0)
+testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(97).skip(0)
 testday = []
 for i in testinfo:
     testday.append(time.strftime('%Y-%m-%d', time.localtime(i["time"])))
@@ -243,8 +243,8 @@ for i in testday:
     a = a.test()
     a.append(i)
     try:
-        zongshouyi = round(zongshouyi + (zongshouyi * a[-2] * 0.01), 3)
+        zongshouyi = zongshouyi + (zongshouyi * a[-2] * 0.01)
         print a
     except IndexError:
         zongshouyi += 0
-print zongshouyi, len(testday), round((zongshouyi - 1) / len(testday) * 100, 3)
+print zongshouyi, len(testday), (zongshouyi - 1) / len(testday) * 100
