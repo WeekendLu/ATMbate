@@ -21,9 +21,9 @@ class StockSelector(object):
         self.cirlation = 0  #流值/市值,默认0.88
         self.pemin = 0  #最小市盈率,默认0
         self.pemax = 999999  #最大市盈率,默认999
-        self.turnoverretemin = 1  #换手率最小,默认1
+        self.turnoverretemin = 0  #换手率最小,默认1
         self.turnoverretemax = 6  #换手率最大,默认20
-        self.amplitudepcsmall = 3  #振幅下限,默认3
+        self.amplitudepcsmall = 2.9  #振幅下限,默认3
         self.amplitudepcbig = 20  #振幅上限,默认20
         self.increasepcmin = -11
         self.increasepcmax = -0.4  #涨幅,默认11
@@ -32,7 +32,7 @@ class StockSelector(object):
         self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
         self.hisincreasecountday = 7
         self.hisincreasedaymax = 7
-        self.pricecountday = 10  #股价统计天数,默认7
+        self.pricecountday = 10  #股价统计天数,默认10
         self.priceincreasesmall = -0.8  #上面天数+1合计最低涨幅,默认-0.8
         self.priceincreasebig = 8  #上面天数+1合计最高涨幅,默认8
         self.pricecontrol = 1000  #股价上限控制,默认1000
