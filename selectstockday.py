@@ -10,7 +10,7 @@ class StockSelector(object):
         self.db = tdb.stock
         self.today = int(time.mktime(time.strptime(testday, "%Y-%m-%d")))
         # self.today = time.time()
-        info = self.db.info.find({"time": {"$lt": self.today}}).sort("time", pymongo.DESCENDING).limit(2932)
+        info = self.db.info.find({"time": {"$lt": self.today}}).sort("time", pymongo.DESCENDING).limit(2938)
         self.allinfo = []
         for i in info:
             self.allinfo.append(i)
@@ -26,7 +26,7 @@ class StockSelector(object):
         self.amplitudepcsmall = 2.9  #振幅下限,默认3
         self.amplitudepcbig = 20  #振幅上限,默认20
         self.increasepcmin = -11
-        self.increasepcmax = -0.4  #涨幅,默认11
+        self.increasepcmax = 0  #涨幅,默认11
         self.volcountday = 30  #交易量统计天数,默认30
         self.volamplitude = 1.2  #不超过最低交易量的几倍,默认1.2
         self.vollastamplitude = 0.98  #大于前一天交易量的几倍,默认0。98
@@ -232,7 +232,7 @@ class StockSelector(object):
 
 tdb = pymongo.MongoClient()
 db = tdb.stock
-testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(97).skip(0)
+testinfo = db.info.find({"name": "000002"}).sort("time", pymongo.DESCENDING).limit(98).skip(0)
 testday = []
 for i in testinfo:
     testday.append(time.strftime('%Y-%m-%d', time.localtime(i["time"])))
